@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3001/api';
 
-export const startDebate = async (topic) => {
-    const response = await axios.post(`${API_URL}/debate/start`, { topic });
+export const startDebate = async (topic, archetype = 'classic') => {
+    const response = await axios.post(`${API_URL}/debate/start`, { topic, archetype });
     return response.data;
 };
 

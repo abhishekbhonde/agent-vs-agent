@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { createDebate, runLlamaTurn, runGeminiTurn, voteWinner, getDebate } from './debate.js';
+import { createDebate, runLlamaTurn, runGeminiTurn, runJudgeTurn, voteWinner, getDebate } from './debate.js';
 
 dotenv.config();
 
@@ -14,18 +14,18 @@ app.use(express.json());
 // Start a new debate
 app.post('/api/debate/start', (req, res) => {
   try {
-    const { topic } = req.body;
+    const { topic, archetype } = req.body;
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
     }
-    const debate = createDebate(topic);
-    res.json({ debateId: debate.id, topic: debate.topic });
+    const debate = createDebate(topic, archetype || 'classic');
+    res.json({ debateId: debate.id, topic: debate.topic, archetype: debate.archetype });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Run an individual turn
+// Run an individual turn (llama, gemini, or judge)
 app.post('/api/debate/turn', async (req, res) => {
   try {
     const { debateId, agent } = req.body;
@@ -44,6 +44,8 @@ app.post('/api/debate/turn', async (req, res) => {
       result = await runLlamaTurn(debateId);
     } else if (agent === 'gemini') {
       result = await runGeminiTurn(debateId);
+    } else if (agent === 'judge') {
+      result = await runJudgeTurn(debateId);
     } else {
       return res.status(400).json({ error: 'Invalid agent type' });
     }
