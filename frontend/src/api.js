@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://agent-vs-agent.onrender.com/api';
 
 export const startDebate = async (topic, archetype = 'classic') => {
     const response = await axios.post(`${API_URL}/debate/start`, { topic, archetype });
